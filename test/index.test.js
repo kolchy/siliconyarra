@@ -29,11 +29,31 @@ test('index.html links the compiled Tailwind stylesheet', () => {
   assert.match(html, /<link rel="stylesheet" href="\/styles\.css">/);
 });
 
-test('index.html uses the dark theme', () => {
-  assert.match(html, /<html[^>]*class="[^"]*\bscheme-dark\b[^"]*"/);
-  const body = html.match(/<body[^>]*class="([^"]*)"/);
-  assert.ok(body, 'expected a class on <body>');
-  const classes = body[1].split(/\s+/);
-  assert.ok(classes.includes('bg-zinc-950'), 'expected a dark background');
-  assert.ok(classes.includes('text-zinc-100'), 'expected light text');
+function classesOf(tag) {
+  const el = html.match(new RegExp(`<${tag}[^>]*class="([^"]*)"`));
+  assert.ok(el, `expected a class on <${tag}>`);
+  return el[1].split(/\s+/);
+}
+
+test('index.html uses the light map theme', () => {
+  assert.ok(classesOf('html').includes('scheme-light'), 'expected a light color scheme');
+  assert.ok(!classesOf('html').includes('scheme-dark'), 'expected the dark theme to be gone');
+  const classes = classesOf('body');
+  assert.ok(classes.includes('bg-stone-100'), 'expected a cream background');
+  assert.ok(classes.includes('text-stone-900'), 'expected dark text');
+});
+
+test('index.html heading is red 3D block letters', () => {
+  const classes = classesOf('h1');
+  for (const cls of ['text-red-600', 'uppercase', 'font-black', '-rotate-6']) {
+    assert.ok(classes.includes(cls), `expected ${cls} on <h1>`);
+  }
+  assert.ok(classes.some((c) => c.startsWith('[text-shadow:')), 'expected an extruded text-shadow on <h1>');
+});
+
+test('index.html footer is a navy band with a green border', () => {
+  const classes = classesOf('footer');
+  for (const cls of ['bg-blue-950', 'text-sky-100', 'border-t-4', 'border-green-600']) {
+    assert.ok(classes.includes(cls), `expected ${cls} on <footer>`);
+  }
 });
