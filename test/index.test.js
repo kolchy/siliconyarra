@@ -12,8 +12,18 @@ test('index.html is an HTML5 document', () => {
 test('index.html main content shows only "Silicon Yarra"', () => {
   const body = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
   assert.ok(body, 'expected a <body> element');
-  const text = body[1].replace(/<footer[\s\S]*<\/footer>/i, '').replace(/<[^>]*>/g, '').trim();
+  const text = body[1]
+    .replace(/<nav[\s\S]*<\/nav>/i, '')
+    .replace(/<footer[\s\S]*<\/footer>/i, '')
+    .replace(/<[^>]*>/g, '')
+    .trim();
   assert.strictEqual(text, 'Silicon Yarra');
+});
+
+test('index.html nav links to the About Us page', () => {
+  const nav = html.match(/<nav[^>]*>([\s\S]*)<\/nav>/i);
+  assert.ok(nav, 'expected a <nav> element');
+  assert.match(nav[1], /<a href="\/about"[^>]*>About Us<\/a>/);
 });
 
 test('index.html has a footer with the unstamped deploy time placeholder', () => {
