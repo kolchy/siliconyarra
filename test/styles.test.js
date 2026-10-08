@@ -20,12 +20,15 @@ test('public/styles.css contains the utilities the page uses', () => {
     '.text-sky-100',
     '.border-green-600',
     '.min-h-screen',
+    '.bg-cover',
+    '.bg-center',
   ]) {
     assert.ok(css.includes(selector), `expected ${selector} in styles.css`);
   }
   assert.match(css, /color-scheme:\s*light/);
   assert.match(css, /text-shadow:[^}]*#7f1d1d/);
   assert.match(css, /font-family:Impact/);
+  assert.match(css, /background-image:radial-gradient\([^}]*\),url\(\/siliconyarra\.png\)/);
 });
 
 test('public/styles.css is up to date with `npm run build:css`', () => {

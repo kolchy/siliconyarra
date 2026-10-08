@@ -43,6 +43,21 @@ test('index.html uses the light map theme', () => {
   assert.ok(classes.includes('text-stone-900'), 'expected dark text');
 });
 
+test('index.html body has the map artwork behind a cream gradient', () => {
+  const classes = classesOf('body');
+  const bg = classes.find((c) => c.startsWith('bg-[') && c.includes('url(/siliconyarra.png)'));
+  assert.ok(bg, 'expected the map image as a body background');
+  assert.match(bg, /^bg-\[(radial|linear)-gradient\(.*\),url\(\/siliconyarra\.png\)\]$/, 'expected a gradient layered over the image');
+  for (const cls of ['bg-cover', 'bg-center']) {
+    assert.ok(classes.includes(cls), `expected ${cls} on <body>`);
+  }
+});
+
+test('public/siliconyarra.png is a PNG image', () => {
+  const png = fs.readFileSync(path.join(__dirname, '..', 'public', 'siliconyarra.png'));
+  assert.deepStrictEqual([...png.subarray(0, 8)], [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+});
+
 test('index.html heading is red 3D block letters', () => {
   const classes = classesOf('h1');
   for (const cls of ['text-red-600', 'uppercase', 'font-black', '-rotate-6']) {
