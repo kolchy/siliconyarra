@@ -1,0 +1,3 @@
+/* Tailwind entry. Compiled to public/styles.css by `npm run build:css`. */
+@import "tailwindcss" source(none);
+@source "../public";
