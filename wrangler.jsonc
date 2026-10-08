@@ -1,6 +1,7 @@
 {
   "name": "siliconyarra",
   "compatibility_date": "2026-10-01",
+  "build": { "command": "node scripts/stamp-deploy-time.js" },
   "assets": { "directory": "./public" },
   "previews": {}
 }
