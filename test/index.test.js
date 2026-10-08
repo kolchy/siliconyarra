@@ -3,7 +3,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
 
 test('index.html is an HTML5 document', () => {
   assert.match(html, /^<!DOCTYPE html>/i);
