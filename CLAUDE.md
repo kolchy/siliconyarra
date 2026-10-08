@@ -10,3 +10,5 @@ These apply to the automated issue agent (`.github/workflows/agent-issue.yml`).
 - Never push to `main`; push `agent/issue-<n>` only. The workflow opens the PR and
   auto-merge ships it once CI is green.
 - If blocked or the issue is ambiguous, comment with the question and stop.
+- Deployment: the site deploys on Cloudflare from `wrangler.jsonc`. Static files live in
+  `public/`. Do not change `wrangler.jsonc` or the deploy setup unless the issue asks.
