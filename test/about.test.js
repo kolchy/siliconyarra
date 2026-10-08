@@ -20,10 +20,12 @@ test('about.html has an About Us title and heading', () => {
   assert.match(html, /<h1[^>]*>About Us<\/h1>/);
 });
 
-test('about.html has lorem ipsum placeholder text', () => {
+test('about.html tells a brief history of house music', () => {
   const main = html.match(/<main[^>]*>([\s\S]*)<\/main>/i);
   assert.ok(main, 'expected a <main> element');
-  assert.match(main[1], /<p>Lorem ipsum dolor sit amet/);
+  assert.match(main[1], /<p>[^<]*house music[^<]*<\/p>/i);
+  assert.match(main[1], /Chicago/);
+  assert.doesNotMatch(main[1], /lorem ipsum/i);
 });
 
 test('about.html nav links back to the home page', () => {
