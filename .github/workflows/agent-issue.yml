@@ -51,6 +51,7 @@ jobs:
       - run: git config user.name "claude-agent" && git config user.email "claude-agent@users.noreply.github.com"
 
       - name: Plan, implement, test
+        id: agent
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -76,6 +77,26 @@ jobs:
                `git push origin ${{ env.BRANCH }}`. Do NOT open a PR and do NOT push to main;
                the workflow does that.
 
+      - name: Summarise agent usage
+        env:
+          EXEC_FILE: ${{ steps.agent.outputs.execution_file }}
+        run: |
+          # claude-code-action saves its transcript as a JSON array; the last "result" entry has totals.
+          if [ -n "$EXEC_FILE" ] && [ -f "$EXEC_FILE" ]; then
+            jq -r '
+              ([.[] | select(.type == "result")] | last // {}) as $r
+              | def v(x): if x == null then "not reported" else (x | tostring) end;
+                "### Agent usage\n\n| Metric | Value |\n|---|---|\n"
+                + "| Cost (USD) | " + (if $r.total_cost_usd == null then "not reported" else "$" + (($r.total_cost_usd * 10000 | round) / 10000 | tostring) end) + " |\n"
+                + "| Input tokens | " + v($r.usage.input_tokens) + " |\n"
+                + "| Output tokens | " + v($r.usage.output_tokens) + " |\n"
+                + "| Cache read tokens | " + v($r.usage.cache_read_input_tokens) + " |\n"
+                + "| Turns | " + v($r.num_turns) + " |\n"
+                + "| Run time | " + (if $r.duration_ms == null then "not reported" else (($r.duration_ms / 1000 | round | tostring) + "s") end) + " |"
+            ' "$EXEC_FILE" > "$RUNNER_TEMP/usage.md" || rm -f "$RUNNER_TEMP/usage.md"
+          fi
+          [ -f "$RUNNER_TEMP/usage.md" ] && cat "$RUNNER_TEMP/usage.md" >> "$GITHUB_STEP_SUMMARY" || true
+
       - name: Open PR and enable auto-merge
         id: pr
         run: |
@@ -83,9 +104,14 @@ jobs:
           if ! git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
             echo "Agent pushed no branch."; exit 1
           fi
+          {
+            echo "Closes #$ISSUE"; echo
+            echo "Automated by the issue agent. Plan is in the issue thread."; echo
+            cat "$RUNNER_TEMP/usage.md" 2>/dev/null || true
+          } > "$RUNNER_TEMP/pr-body.md"
           gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$BRANCH" \
             --title "Agent: ${{ github.event.issue.title }}" \
-            --body "Closes #$ISSUE"$'\n\n'"Automated by the issue agent. Plan is in the issue thread."
+            --body-file "$RUNNER_TEMP/pr-body.md"
           gh pr merge "$BRANCH" --repo "$GITHUB_REPOSITORY" --auto --squash --delete-branch
 
       - name: Hand off to a human on failure
