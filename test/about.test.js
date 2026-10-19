@@ -34,6 +34,12 @@ test('about.html nav links back to the home page', () => {
   assert.match(nav[1], /<a href="\/"[^>]*>Home<\/a>/);
 });
 
+test('about.html nav links to the Privacy Statement page', () => {
+  const nav = html.match(/<nav[^>]*>([\s\S]*)<\/nav>/i);
+  assert.ok(nav, 'expected a <nav> element');
+  assert.match(nav[1], /<a href="\/privacy"[^>]*>Privacy<\/a>/);
+});
+
 test('about.html links the compiled Tailwind stylesheet', () => {
   assert.match(html, /<link rel="stylesheet" href="\/styles\.css">/);
 });

@@ -26,6 +26,12 @@ test('index.html nav links to the About Us page', () => {
   assert.match(nav[1], /<a href="\/about"[^>]*>About Us<\/a>/);
 });
 
+test('index.html nav links to the Privacy Statement page', () => {
+  const nav = html.match(/<nav[^>]*>([\s\S]*)<\/nav>/i);
+  assert.ok(nav, 'expected a <nav> element');
+  assert.match(nav[1], /<a href="\/privacy"[^>]*>Privacy<\/a>/);
+});
+
 test('index.html has a footer with the unstamped deploy time placeholder', () => {
   const footer = html.match(/<footer[^>]*>([\s\S]*)<\/footer>/i);
   assert.ok(footer, 'expected a <footer> element');
